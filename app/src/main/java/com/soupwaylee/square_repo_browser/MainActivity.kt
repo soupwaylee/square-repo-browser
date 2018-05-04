@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                                 val jsonObj = response.getJSONObject(i)
                                 val repoName = jsonObj.get("name").toString()
                                 val stargazersCount = jsonObj.get("stargazers_count").toString()
-                                repoList.add(Repo(repoName, stargazersCount))
+                                repoList.add(Repo(name=repoName, stars=stargazersCount))
                             } catch (e: JSONException) {
                                 Log.e("$TAG Volley", "Invalid JSON Object.")
                             }
