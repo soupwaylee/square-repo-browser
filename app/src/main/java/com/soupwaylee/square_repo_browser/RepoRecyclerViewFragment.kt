@@ -25,12 +25,10 @@ import com.soupwaylee.square_repo_browser.databinding.RecyclerItemRepoBinding
  *
  */
 class RepoRecyclerViewFragment : Fragment() {
-    private lateinit var layoutManager: RecyclerView.LayoutManager
-
     private var SQUARE_REPOS_URL = "https://api.github.com/orgs/square/repos"
     private lateinit var repoList : ArrayList<Repo>
 
-    private lateinit var listener : OnRepoSelected
+//    private lateinit var listener : OnRepoSelected
 
     var requestQueue: RequestQueue? = null
 
@@ -42,36 +40,48 @@ class RepoRecyclerViewFragment : Fragment() {
         }
     }
 
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        // Initialize dataset
+//
+//        requestQueue = Volley.newRequestQueue(activity)
+//
+//        repoList = ArrayList()
+//
+//        // get repo list here instead of within main activity
+//        getRepoList()
+//    }
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        if (context is OnRepoSelected) {
-            listener = context
-        } else {
-            throw ClassCastException(context.toString() + " must implement OnRageComicSelected")
-        }
-
         requestQueue = Volley.newRequestQueue(activity)
 
-        repoList = ArrayList()
+        repoList = getRepoList()
 
-        // get repo list here instead of within main activity
-        getRepoList()
+//        if (context is OnRepoSelected) {
+//            listener = context
+//        } else {
+//            throw ClassCastException(context.toString() + " must implement OnRageComicSelected")
+//        }
     }
 
     override fun onCreateView(inflater: LayoutInflater?,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val rootView = inflater!!.inflate(R.layout.fragment_repo_recycler_view, container,
+        val rootView : View = inflater!!.inflate(R.layout.fragment_repo_recycler_view, container,
                 false).apply { tag = TAG}
         val activity = activity
-        val recyclerView = rootView.findViewById(R.id.repoRecyclerView) as RecyclerView
+        val recyclerView = rootView.findViewById(R.id.repo_recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = RepoRecyclerViewAdapter(activity, repoList)
+        recyclerView.adapter = RepoRecyclerViewAdapter(activity)
         return rootView
     }
 
-    private fun getRepoList() {
+    private fun getRepoList() : ArrayList<Repo> {
+        val result = ArrayList<Repo>()
+
         val arrReq = JsonArrayRequest(Request.Method.GET, SQUARE_REPOS_URL, null,
                 Response.Listener { response ->
                     if (response.length() > 0) {
@@ -83,12 +93,11 @@ class RepoRecyclerViewFragment : Fragment() {
                                 val repoId = jsonObj.get("id").toString()
                                 val repoName = jsonObj.get("name").toString()
                                 val repoStargazersCount = jsonObj.get("stargazers_count").toString()
-                                repoList.add(Repo(id=repoId, name=repoName, stars=repoStargazersCount))
+                                result.add(Repo(id=repoId, name=repoName, stars=repoStargazersCount))
                             } catch (e: JSONException) {
                                 Log.e("${MainActivity.TAG} Volley", "Invalid JSON Object.")
                             }
                         }
-                        Toast.makeText(activity, "Gotten repos.", Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(activity, "No repos found.", Toast.LENGTH_LONG).show()
                     }
@@ -102,15 +111,20 @@ class RepoRecyclerViewFragment : Fragment() {
                 }
         )
         requestQueue?.add(arrReq)
+
+        return result
     }
 
-    internal inner class RepoRecyclerViewAdapter(context: Context, private val repoArrayList: ArrayList<Repo>) :
+    internal inner class RepoRecyclerViewAdapter(context: Context) :
             RecyclerView.Adapter<ViewHolder>() {
 
         private val layoutInflater: LayoutInflater
 
         init {
             layoutInflater = LayoutInflater.from(context)
+            if (repoList.size == 0) {
+                Toast.makeText(activity, "Nothing to show.", Toast.LENGTH_LONG).show() //todo repoList seems to be empty...
+            }
         }
 
         override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -122,13 +136,12 @@ class RepoRecyclerViewFragment : Fragment() {
         // Replace the contents of a view (invoked by the layout manager)
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
             Log.d(TAG, "Element $position set.")
-            val repo = Repo(repoArrayList[position].id, repoArrayList[position].name, repoArrayList[position].stars)
-            viewHolder.setData(repo)
-            viewHolder.itemView.setOnClickListener{ listener.onRepoSelected(repo) }
+            viewHolder.setData(repoList[position])
+//            viewHolder.itemView.setOnClickListener{ listener.onRepoSelected(repo) }
         }
 
 
-        override fun getItemCount() = repoArrayList.size
+        override fun getItemCount() = repoList.size
     }
 
 

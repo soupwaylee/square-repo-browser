@@ -11,13 +11,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            // grab FragmentManager by referencing supportFragmentManager
             supportFragmentManager
                     .beginTransaction()
-                    .add(R.id.root_layout, RepoRecyclerViewFragment.newInstance())
-                    .commit() // execute the transaction
+                    .add(R.id.root_layout, RepoRecyclerViewFragment.newInstance(), "repoRecycler")
+                    .commit()
         }
     }
+
+//    override fun OnRepoSelected(repo: Repo) {
+//        val detailFragment =
+//                RepoDetailFragment.newInstance(repo)
+//        supportFragmentManager.beginTransaction()
+//                .replace(R.id.root_layout, detailFragment, "repoDetails") // replace the fragment that is currently populating the container
+//                .addToBackStack(null) // Fragment back stack = history (just like activities)
+//                .commit()
+//    }
 
     companion object {
         val TAG = "MainActivity"
