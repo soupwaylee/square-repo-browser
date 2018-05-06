@@ -18,6 +18,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 
+import com.soupwaylee.square_repo_browser.databinding.RecyclerItemRepoBinding
 
 /**
  * A simple [Fragment] subclass.
@@ -29,10 +30,26 @@ class RepoRecyclerViewFragment : Fragment() {
     private var SQUARE_REPOS_URL = "https://api.github.com/orgs/square/repos"
     private lateinit var repoList : ArrayList<Repo>
 
+    private lateinit var listener : OnRepoSelected
+
     var requestQueue: RequestQueue? = null
+
+    companion object {
+        private val TAG = "RepoRecyclerViewAdapter"
+
+        fun newInstance(): RepoRecyclerViewFragment {
+            return RepoRecyclerViewFragment()
+        }
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+
+        if (context is OnRepoSelected) {
+            listener = context
+        } else {
+            throw ClassCastException(context.toString() + " must implement OnRageComicSelected")
+        }
 
         requestQueue = Volley.newRequestQueue(activity)
 
@@ -42,7 +59,7 @@ class RepoRecyclerViewFragment : Fragment() {
         getRepoList()
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
+    override fun onCreateView(inflater: LayoutInflater?,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_repo_recycler_view, container,
@@ -71,6 +88,7 @@ class RepoRecyclerViewFragment : Fragment() {
                                 Log.e("${MainActivity.TAG} Volley", "Invalid JSON Object.")
                             }
                         }
+                        Toast.makeText(activity, "Gotten repos.", Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(activity, "No repos found.", Toast.LENGTH_LONG).show()
                     }
@@ -86,11 +104,44 @@ class RepoRecyclerViewFragment : Fragment() {
         requestQueue?.add(arrReq)
     }
 
-    companion object {
-        private val TAG = "RepoRecyclerViewFragment"
+    internal inner class RepoRecyclerViewAdapter(context: Context, private val repoArrayList: ArrayList<Repo>) :
+            RecyclerView.Adapter<ViewHolder>() {
 
-        fun newInstance(): RepoRecyclerViewFragment {
-            return RepoRecyclerViewFragment()
+        private val layoutInflater: LayoutInflater
+
+        init {
+            layoutInflater = LayoutInflater.from(context)
         }
+
+        override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+            val recyclerItemRepoBinding = RecyclerItemRepoBinding.inflate(
+                    layoutInflater, viewGroup, false)
+            return ViewHolder(recyclerItemRepoBinding.root, recyclerItemRepoBinding)
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+            Log.d(TAG, "Element $position set.")
+            val repo = Repo(repoArrayList[position].id, repoArrayList[position].name, repoArrayList[position].stars)
+            viewHolder.setData(repo)
+            viewHolder.itemView.setOnClickListener{ listener.onRepoSelected(repo) }
+        }
+
+
+        override fun getItemCount() = repoArrayList.size
+    }
+
+
+    internal inner class ViewHolder constructor(itemView: View,
+                                                val recyclerItemRepoBinding: RecyclerItemRepoBinding) :
+            RecyclerView.ViewHolder(itemView) {
+
+        fun setData (repo: Repo) {
+            recyclerItemRepoBinding.repo = repo
+        }
+    }
+
+    interface OnRepoSelected {
+        fun onRepoSelected(repo: Repo)
     }
 }
