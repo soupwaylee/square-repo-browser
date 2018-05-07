@@ -11,11 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
-        <TextView
+        <ImageView
             android:id="@+id/repoTitleTextView"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            tools:text="@{stargazer.avatar}"/>
+            android:layout_height="match_parent"/>
         <TextView
             android:id="@+id/stargazersTextView"
             android:layout_width="wrap_content"
