@@ -28,7 +28,7 @@ class RepoRecyclerViewFragment : Fragment() {
     private var SQUARE_REPOS_URL = "https://api.github.com/orgs/square/repos"
     private lateinit var repoList : ArrayList<Repo>
 
-//    private lateinit var listener : OnRepoSelected
+    private lateinit var listener : OnRepoSelected
 
     var requestQueue: RequestQueue? = null
 
@@ -40,38 +40,30 @@ class RepoRecyclerViewFragment : Fragment() {
         }
     }
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        // Initialize dataset
-//
-//        requestQueue = Volley.newRequestQueue(activity)
-//
-//        repoList = ArrayList()
-//
-//        // get repo list here instead of within main activity
-//        getRepoList()
-//    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestQueue = Volley.newRequestQueue(activity);
+
+        //todo MainActivity should implement a custom callback interface so the recycler view fragment can call back to activity to send updates
+        // this doesn't show up in the UI yet, because the volley request is asynchronous...
+        repoList = getRepoList()
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        requestQueue = Volley.newRequestQueue(activity)
-
-        repoList = getRepoList()
-
-//        if (context is OnRepoSelected) {
-//            listener = context
-//        } else {
-//            throw ClassCastException(context.toString() + " must implement OnRageComicSelected")
-//        }
+        if (context is OnRepoSelected) {
+            listener = context
+        } else {
+            throw ClassCastException(context.toString() + " must implement OnRepoSelected")
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater?,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView : View = inflater!!.inflate(R.layout.fragment_repo_recycler_view, container,
-                false).apply { tag = TAG}
+                false).apply { tag = TAG }
         val activity = activity
         val recyclerView = rootView.findViewById(R.id.repo_recycler_view) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -122,9 +114,6 @@ class RepoRecyclerViewFragment : Fragment() {
 
         init {
             layoutInflater = LayoutInflater.from(context)
-            if (repoList.size == 0) {
-                Toast.makeText(activity, "Nothing to show.", Toast.LENGTH_LONG).show() //todo repoList seems to be empty...
-            }
         }
 
         override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -137,7 +126,7 @@ class RepoRecyclerViewFragment : Fragment() {
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
             Log.d(TAG, "Element $position set.")
             viewHolder.setData(repoList[position])
-//            viewHolder.itemView.setOnClickListener{ listener.onRepoSelected(repo) }
+            viewHolder.itemView.setOnClickListener{ listener.onRepoSelected(repoList[position]) }
         }
 
 
