@@ -26,16 +26,17 @@ import com.soupwaylee.square_repo_browser.databinding.RecyclerItemRepoBinding
  */
 class RepoRecyclerViewFragment : Fragment() {
     private var SQUARE_REPOS_URL = "https://api.github.com/orgs/square/repos"
-    private lateinit var repoList : ArrayList<Repo>
 
     private lateinit var listener : OnRepoSelected
 
     var requestQueue: RequestQueue? = null
 
     companion object {
+        private lateinit var repoList : ArrayList<Repo>
         private val TAG = "RepoRecyclerViewAdapter"
 
-        fun newInstance(): RepoRecyclerViewFragment {
+        fun newInstance(repoList : ArrayList<Repo>): RepoRecyclerViewFragment {
+            this.repoList = repoList
             return RepoRecyclerViewFragment()
         }
     }
@@ -43,10 +44,6 @@ class RepoRecyclerViewFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestQueue = Volley.newRequestQueue(activity);
-
-        //todo MainActivity should implement a custom callback interface so the recycler view fragment can call back to activity to send updates
-        // this doesn't show up in the UI yet, because the volley request is asynchronous...
-        repoList = getRepoList()
     }
 
     override fun onAttach(context: Context?) {
@@ -69,42 +66,6 @@ class RepoRecyclerViewFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = RepoRecyclerViewAdapter(activity)
         return rootView
-    }
-
-    private fun getRepoList() : ArrayList<Repo> {
-        val result = ArrayList<Repo>()
-
-        val arrReq = JsonArrayRequest(Request.Method.GET, SQUARE_REPOS_URL, null,
-                Response.Listener { response ->
-                    if (response.length() > 0) {
-                        // The user does have repos, so let's loop through them all.
-                        for (i in 0 until response.length()) {
-                            try {
-                                // For each repo, add a new line to our repo list.
-                                val jsonObj = response.getJSONObject(i)
-                                val repoId = jsonObj.get("id").toString()
-                                val repoName = jsonObj.get("name").toString()
-                                val repoStargazersCount = jsonObj.get("stargazers_count").toString()
-                                result.add(Repo(id=repoId, name=repoName, stars=repoStargazersCount))
-                            } catch (e: JSONException) {
-                                Log.e("${MainActivity.TAG} Volley", "Invalid JSON Object.")
-                            }
-                        }
-                    } else {
-                        Toast.makeText(activity, "No repos found.", Toast.LENGTH_LONG).show()
-                    }
-                },
-                Response.ErrorListener { error ->
-                    Log.i("${MainActivity.TAG} RespErr", error.message)
-                    Toast.makeText(
-                            activity,
-                            "Unsuccessful request to GitHub endpoint.",
-                            Toast.LENGTH_LONG).show()
-                }
-        )
-        requestQueue?.add(arrReq)
-
-        return result
     }
 
     internal inner class RepoRecyclerViewAdapter(context: Context) :
