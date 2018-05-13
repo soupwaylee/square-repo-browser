@@ -10,14 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
-import org.json.JSONException
-
 import com.soupwaylee.square_repo_browser.databinding.RecyclerItemRepoBinding
 
 /**
@@ -32,7 +26,7 @@ class RepoRecyclerViewFragment : Fragment() {
     var requestQueue: RequestQueue? = null
 
     companion object {
-        private lateinit var repoList : ArrayList<Repo>
+        private var repoList : ArrayList<Repo> = ArrayList()
         private val TAG = "RepoRecyclerViewAdapter"
 
         fun newInstance(repoList : ArrayList<Repo>): RepoRecyclerViewFragment {
@@ -43,7 +37,7 @@ class RepoRecyclerViewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestQueue = Volley.newRequestQueue(activity);
+        requestQueue = Volley.newRequestQueue(activity)
     }
 
     override fun onAttach(context: Context?) {

@@ -41,13 +41,11 @@ public class NetworkFragment extends Fragment {
      */
     public static NetworkFragment getInstance(FragmentManager fragmentManager, String url, Context context) {
         NetworkFragment networkFragment = new NetworkFragment();
+        requestQueue = Volley.newRequestQueue(context);
         Bundle args = new Bundle();
         args.putString(URL_KEY, url);
         networkFragment.setArguments(args);
         fragmentManager.beginTransaction().add(networkFragment, TAG).commit();
-
-        requestQueue = Volley.newRequestQueue(context);
-
         return networkFragment;
     }
 
@@ -64,7 +62,10 @@ public class NetworkFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         // Host Activity will handle callbacks from task.
-        mCallback = (VolleyRequestCallback) context; //todo unchecked assignment
+        mCallback = (VolleyRequestCallback<ArrayList<Repo>>) context; // todo unchecked assignment
+        if (mCallback == null) {
+            throw new ClassCastException(context.toString() + " must implement VolleyRequestCallback<T>!");
+        }
     }
 
     @Override
@@ -82,7 +83,7 @@ public class NetworkFragment extends Fragment {
     }
 
     /**
-     * Start non-blocking execution of DownloadTask.
+     * Start non-blocking execution
      */
     public void startDownload() {
         cancelDownload();
@@ -108,6 +109,11 @@ public class NetworkFragment extends Fragment {
                                 }
                             }
                         }
+                        if (result.size() == 0)
+                            mCallback.updateFromDownload(null);
+                        else
+                            mCallback.updateFromDownload(result);
+                        mCallback.finishDownloading();
                     }
                 },
                 new Response.ErrorListener(){
@@ -118,12 +124,6 @@ public class NetworkFragment extends Fragment {
                 }
         );
         requestQueue.add(request);
-
-        if (result.size() == 0)
-            mCallback.updateFromDownload(null);
-        else
-            mCallback.updateFromDownload(result);
-        mCallback.finishDownloading();
     }
 
     public void cancelDownload() {
