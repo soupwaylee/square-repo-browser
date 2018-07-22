@@ -1,7 +1,11 @@
-package com.soupwaylee.square_repo_browser
+package com.soupwaylee.square_repo_browser.ui.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.soupwaylee.square_repo_browser.*
+import com.soupwaylee.square_repo_browser.data.Repo
+import com.soupwaylee.square_repo_browser.ui.fragments.NetworkFragment
+import com.soupwaylee.square_repo_browser.ui.fragments.RepoRecyclerViewFragment
 
 
 class MainActivity : AppCompatActivity(), RepoRecyclerViewFragment.OnRepoSelected, VolleyRequestCallback<ArrayList<Repo>> {

@@ -1,4 +1,4 @@
-package com.soupwaylee.square_repo_browser
+package com.soupwaylee.square_repo_browser.data
 
 import java.io.Serializable
 

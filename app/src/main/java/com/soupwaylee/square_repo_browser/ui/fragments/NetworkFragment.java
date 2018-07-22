@@ -1,4 +1,4 @@
-package com.soupwaylee.square_repo_browser;
+package com.soupwaylee.square_repo_browser.ui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.soupwaylee.square_repo_browser.data.Repo;
+import com.soupwaylee.square_repo_browser.VolleyRequestCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;

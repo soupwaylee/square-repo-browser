@@ -4,7 +4,7 @@
 
         <variable
             name="stargazer"
-            type="com.soupwaylee.square_repo_browser.Stargazer"/>
+            type="com.soupwaylee.square_repo_browser.data.Stargazer"/>
     </data>
 
     <LinearLayout xmlns:tools="http://schemas.android.com/tools"

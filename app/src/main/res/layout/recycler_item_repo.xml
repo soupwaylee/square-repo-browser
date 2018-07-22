@@ -19,7 +19,7 @@
 
         <variable
             name="repo"
-            type="com.soupwaylee.square_repo_browser.Repo"/>
+            type="com.soupwaylee.square_repo_browser.data.Repo"/>
     </data>
 
     <LinearLayout xmlns:tools="http://schemas.android.com/tools"

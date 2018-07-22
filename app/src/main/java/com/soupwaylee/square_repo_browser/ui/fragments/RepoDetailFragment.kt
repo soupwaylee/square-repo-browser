@@ -1,19 +1,19 @@
-package com.soupwaylee.square_repo_browser
+package com.soupwaylee.square_repo_browser.ui.fragments
 
 
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.soupwaylee.square_repo_browser.data.Repo
+import com.soupwaylee.square_repo_browser.data.Stargazer
+import com.soupwaylee.square_repo_browser.ui.activities.MainActivity
 import org.json.JSONException
 import java.io.Serializable
 
@@ -62,7 +62,7 @@ class RepoDetailFragment : Fragment() {
                                 val repoId = jsonObj.get("id").toString()
                                 val repoName = jsonObj.get("name").toString()
                                 val repoStargazersCount = jsonObj.get("stargazers_count").toString()
-                                result.add(Repo(id=repoId, name=repoName, stars=repoStargazersCount))
+                                result.add(Repo(id = repoId, name = repoName, stars = repoStargazersCount))
                             } catch (e: JSONException) {
                                 Log.e("${MainActivity.TAG} Volley", "Invalid JSON Object.")
                             }

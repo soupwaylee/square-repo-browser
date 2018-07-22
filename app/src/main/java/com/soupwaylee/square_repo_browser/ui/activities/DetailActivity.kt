@@ -1,7 +1,9 @@
-package com.soupwaylee.square_repo_browser
+package com.soupwaylee.square_repo_browser.ui.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.soupwaylee.square_repo_browser.R
+import com.soupwaylee.square_repo_browser.ui.fragments.RepoDetailFragment
 
 class DetailActivity : AppCompatActivity() {
 

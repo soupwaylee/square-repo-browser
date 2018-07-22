@@ -1,4 +1,4 @@
-package com.soupwaylee.square_repo_browser
+package com.soupwaylee.square_repo_browser.ui.fragments
 
 
 import android.content.Context
@@ -12,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import com.soupwaylee.square_repo_browser.R
+import com.soupwaylee.square_repo_browser.data.Repo
 import com.soupwaylee.square_repo_browser.databinding.RecyclerItemRepoBinding
 
 /**
@@ -30,7 +32,7 @@ class RepoRecyclerViewFragment : Fragment() {
         private val TAG = "RepoRecyclerViewAdapter"
 
         fun newInstance(repoList : ArrayList<Repo>): RepoRecyclerViewFragment {
-            this.repoList = repoList
+            Companion.repoList = repoList
             return RepoRecyclerViewFragment()
         }
     }
