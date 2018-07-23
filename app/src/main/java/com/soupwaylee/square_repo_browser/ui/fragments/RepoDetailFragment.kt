@@ -4,84 +4,65 @@ package com.soupwaylee.square_repo_browser.ui.fragments
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
-import android.widget.Toast
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
-import com.soupwaylee.square_repo_browser.data.Repo
-import com.soupwaylee.square_repo_browser.data.Stargazer
-import com.soupwaylee.square_repo_browser.ui.activities.MainActivity
-import org.json.JSONException
-import java.io.Serializable
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.soupwaylee.square_repo_browser.R
+import com.soupwaylee.square_repo_browser.data.Owner
+import com.soupwaylee.square_repo_browser.data.StargazerResult
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.recycler_item_stargazer.view.*
 
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class RepoDetailFragment : Fragment() {
-    private lateinit var stargazerList : ArrayList<Stargazer>
-    var requestQueue: RequestQueue? = null
-
-// todo pass repoID property
 
     companion object {
+        private lateinit var stargazerList: StargazerResult
         private val TAG = "RepoDetailsRecyclerView"
 
-        fun newInstance(repo: Repo): RepoDetailFragment {
-            val args = Bundle()
-            args.putSerializable("repo", repo as Serializable)
-            val fragment = RepoDetailFragment()
-            fragment.arguments = args
-            return fragment
+        fun newInstance(stargazerList: StargazerResult): RepoDetailFragment {
+            this.stargazerList = stargazerList
+            return RepoDetailFragment()
         }
     }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-
-        requestQueue = Volley.newRequestQueue(activity)
-
-//        stargazerList = getStargazerList()
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val rootView: View = inflater!!.inflate(R.layout.fragment_repo_detail, container, false).apply { tag = RepoDetailFragment.TAG }
+        val activity = activity
+        val recyclerView = rootView.findViewById(R.id.repo_detail_recycler_view) as RecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = RepoDetailAdapter(activity, stargazerList)
+        return rootView
     }
 
-    private fun getStargazerList(repoID: String) : ArrayList<Repo> {
-        val result = ArrayList<Repo>()
 
-        val arrReq = JsonArrayRequest(Request.Method.GET, "https://api.github.com/repos/square/$repoID/stargazers", null,
-                Response.Listener { response ->
-                    if (response.length() > 0) {
-                        // The user does have repos, so let's loop through them all.
-                        for (i in 0 until response.length()) {
-                            try {
-                                // For each repo, add a new line to our repo list.
-                                val jsonObj = response.getJSONObject(i)
-                                val repoId = jsonObj.get("id").toString()
-                                val repoName = jsonObj.get("name").toString()
-                                val repoStargazersCount = jsonObj.get("stargazers_count").toString()
-                                result.add(Repo(id = repoId, name = repoName, stars = repoStargazersCount))
-                            } catch (e: JSONException) {
-                                Log.e("${MainActivity.TAG} Volley", "Invalid JSON Object.")
-                            }
-                        }
-                    } else {
-                        Toast.makeText(activity, "No repos found.", Toast.LENGTH_LONG).show()
-                    }
-                },
-                Response.ErrorListener { error ->
-                    Log.i("${MainActivity.TAG} RespErr", error.message)
-                    Toast.makeText(
-                            activity,
-                            "Unsuccessful request to GitHub endpoint.",
-                            Toast.LENGTH_LONG).show()
+    inner class RepoDetailAdapter(context: Context, private val stargazerList: StargazerResult) : RecyclerView.Adapter<RepoDetailAdapter.ViewHolder>() {
+        private val layoutInflater: LayoutInflater
+
+        init {
+            layoutInflater = LayoutInflater.from(context)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val recyclerItemRepoBinding = layoutInflater.inflate(R.layout.recycler_item_stargazer, parent, false)
+            return ViewHolder(recyclerItemRepoBinding)
+        }
+
+        override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+            viewHolder.bindRepo(stargazerList.owners[position])
+        }
+
+        override fun getItemCount() = stargazerList.owners.size
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            fun bindRepo(owner: Owner) {
+                with(owner) {
+                    Picasso.get().load(owner.avatar_url).into(itemView.stargazerAvatar)
+                    itemView.stargazerLogin.text = owner.login.orEmpty()
                 }
-        )
-        requestQueue?.add(arrReq)
-
-        return result
+            }
+        }
     }
-
 }
